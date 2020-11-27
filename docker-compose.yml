@@ -1,0 +1,40 @@
+version: "2"
+services:
+  prometheus:
+    image: "prom/prometheus:latest"
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention=31d'
+    ports:
+      - "9090:9090"
+    volumes:
+      - "prometheus:/prometheus"
+      - "./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml"
+      - "./prometheus/tg_dse.json:/etc/prometheus/tg_dse.json"
+  graphite_exporter:
+    image: "prom/graphite-exporter:latest"
+    command:
+      - '--graphite.mapping-config=/tmp/graphite_mapping.conf'
+    volumes:
+      - "./graphite/graphite_mapping.conf:/tmp/graphite_mapping.conf"
+    ports:
+      - "9108:9108"
+      - "9109:9109"
+  grafana:
+    image: "grafana/grafana:latest"
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+    links:
+      - prometheus
+    volumes:
+      - "grafana:/var/lib/grafana"
+      - "./grafana/prometheus-datasource.yaml:/etc/grafana/provisioning/datasources/prometheus-datasource.yaml"
+      - "./grafana/dashboards.yaml:/etc/grafana/provisioning/dashboards/dashboards.yaml"
+      - "./grafana/dashboards:/var/lib/grafana/dashboards:ro"
+volumes:
+  grafana:
+  prometheus:

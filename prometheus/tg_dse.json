@@ -1,0 +1,12 @@
+[
+  {
+    "targets": [ 
+      "node1:9103",
+      "node...:9103",
+      "nodeN:9103"
+    ],
+    "labels": {
+      "cluster": "cass"
+    }
+  }
+]
